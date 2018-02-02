@@ -48,22 +48,37 @@ formatSingleHgvs <- function(chrom, pos, ref, alt, mutant_type=FALSE){
   else{hgvs}
 }
 
-formatHgvs <- function(vcf, variant_type=c("snp", "insertion", "deletion")){
-  seqlevelsStyle(vcf) <- "UCSC"
-  if ("snp" %in% variant_type){
-    snps <- .getSnps(vcf)
-  }
-  else{ snps <- NULL}
-  if ("insertion" %in% variant_type){
-    ins <- .getIns(vcf)
-  }
-  else{ins <- NULL}
-  if ("deletion" %in% variant_type){
-    del <-.getDels(vcf)
-  }
-  else{del <- NULL}
-  hgvs <- c(snps, ins, del)
-  hgvs
+formatHgvs <- function (vcf, variant_type = c("snp", "insertion", "deletion")) 
+{
+ seqlevelsStyle(vcf) <- "UCSC"
+ if ("snp" %in% variant_type) {
+   snps <- .getSnps(vcf)
+ }
+ else {
+   snps <- NULL
+ }
+ if ("insertion" %in% variant_type) {
+   ins <- .getIns(vcf)
+ }
+ else {
+   ins <- NULL
+ }
+ if ("deletion" %in% variant_type) {
+   del <- .getDels(vcf)
+ }
+ else {
+   del <- NULL
+ }
+ f <- rep(NA, length(vcf))
+ f[isSNV(vcf)] <- 'snp'
+ f[isInsertion(vcf)] <- 'ins'
+ f[isDeletion(vcf)] <- 'del'
+ 
+ hgvs <- NA
+ hgvs[which(f=='snp')] <- snps
+ hgvs[which(f=='ins')] <- ins
+ hgvs[which(f=='del')] <- del
+ hgvs
 }
 
 .getSnps <- function(vcf){
